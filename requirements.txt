@@ -9,3 +9,5 @@ sounddevice
 scipy
 pygame
 pdfplumber
+ffmpeg-python
+faster-whisper
