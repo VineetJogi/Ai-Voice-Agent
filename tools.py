@@ -1,7 +1,7 @@
 import sqlite3
 import json
 
-DB_NAME = "store.db"
+DB_NAME = "database.db"
 
 def get_db_connection():
     conn = sqlite3.connect(DB_NAME)
