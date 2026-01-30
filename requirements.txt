@@ -1,0 +1,10 @@
+streamlit
+google-generativeai
+openai-whisper
+edge-tts
+nest_asyncio
+pandas
+numpy
+sounddevice
+scipy
+pygame
