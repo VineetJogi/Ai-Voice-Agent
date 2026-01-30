@@ -8,3 +8,5 @@ numpy
 sounddevice
 scipy
 pygame
+pdfplumber
+sqlite3
