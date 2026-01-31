@@ -9,7 +9,7 @@ import tempfile
 # --- CONFIGURATION ---
 # "True" uses your Mac's 'say' command (Instant)
 # "False" uses EdgeTTS (Higher Quality)
-FAST_MODE = True  
+FAST_MODE = False
 
 print("🎤 Initializing SpeechRecognition (Google Mode)...")
 recognizer = sr.Recognizer()
