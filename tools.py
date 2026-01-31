@@ -1,10 +1,16 @@
 import sqlite3
 import json
+import os
 
 DB_NAME = "database.db"
 
 def get_db_connection():
-    conn = sqlite3.connect(DB_NAME)
+    # Get the folder where THIS python file is located
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    # Join it with the database name
+    db_path = os.path.join(base_dir, DB_NAME)
+    
+    conn = sqlite3.connect(db_path) # <--- Use the full path
     conn.row_factory = sqlite3.Row 
     return conn
 
