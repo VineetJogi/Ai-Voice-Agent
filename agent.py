@@ -1,4 +1,7 @@
 import os
+# CRITICAL FIX FOR WINDOWS HANGING
+os.environ['GRPC_DNS_RESOLVER'] = 'native'
+os.environ['GRPC_VERBOSITY'] = 'NONE'
 import google.generativeai as genai
 from google.generativeai.types import RequestOptions
 from google.api_core import retry
@@ -6,7 +9,7 @@ import tools  # <--- This imports the file you just pasted
 
 # --- CONFIGURATION ---
 # PASTE YOUR API KEY HERE
-GOOGLE_API_KEY = "AIzaSyDidXuBe7NCYmXp5cMtyKJjj-Jwsu7BFIQ"
+GOOGLE_API_KEY = "AIzaSyAgv8qqZJTG5htkWC42oeQs7L02goCuFT0"
 
 genai.configure(api_key=GOOGLE_API_KEY)
 
