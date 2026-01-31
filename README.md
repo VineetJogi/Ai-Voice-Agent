@@ -14,14 +14,14 @@ Ai-Voice-Agent is a Python-based conversational voice agent that integrates spee
 - `agent.py` — Core agent logic and orchestration
 - `audio.py` — Audio input/output handling utilities
 - `tools.py` — Helper functions and utilities
-- `data/` — Directory for auxiliary data (models, samples, etc.)
+- `data/` — Directory for data files
 - `database.db` — SQLite database file (contains runtime data)
 - `requirements.txt` — Python dependencies
 
 ## Prerequisites
 - Python 3.8+ recommended
 - A working microphone and speakers (if using voice in/out)
-- Required API keys for AI/third-party services (e.g., OpenAI) if the agent uses external APIs
+- Required API keys for AI/third-party services (e.g., Google Gemini) if the agent uses external APIs
 
 ## Installation
 1. Clone the repository
@@ -45,37 +45,32 @@ Ai-Voice-Agent is a Python-based conversational voice agent that integrates spee
 
 ## Configuration
 - Create a `.env` file or export environment variables required by the code. Typical variables you may need:
-  - `OPENAI_API_KEY` — API key for OpenAI (if used)
-  - Any other provider keys referenced in source code
+  - `GEMINI_API_KEY` — API key for Gemini
 
 Example `.env`:
 ```env
-OPENAI_API_KEY=your_openai_api_key_here
+GEMINI_API_KEY=your_gemini_api_key_here
 ```
-
-- If the project expects device names or other audio settings, edit them in a configuration section at the top of `app.py` or `audio.py`, or set the appropriate environment variables as indicated in the source.
 
 ## Usage
 - Run the application:
   ```bash
-  python app.py
+  streamlit run app.py
   ```
 
 - Run the agent directly (if you want to run code in isolation):
   ```bash
-  python agent.py
+  streamlit run agent.py
   ```
 
-- Typical flow:
+- App Flow:
   1. The app captures audio from your microphone (via `audio.py`).
   2. Audio is converted to text (speech-to-text) and passed to the agent core (`agent.py`).
   3. The agent generates a response (using internal logic or external AI).
   4. The response is converted back to speech and played on the speakers.
 
-Refer to the top of each file (`app.py`, `agent.py`, `audio.py`) for any file-specific runtime options or CLI flags.
-
 ## Database
-- `database.db` is included in the repository. This likely contains example data or runtime state.
+- `database.db` is included in the repository. This contains example data.
 - For cleaner version control, consider adding `database.db` to `.gitignore` and re-creating an empty DB during setup or runtime.
 
 ## Development
@@ -84,8 +79,6 @@ Refer to the top of each file (`app.py`, `agent.py`, `audio.py`) for any file-sp
   - Run the app locally and iterate
   - Add tests where appropriate
   - Open PRs against `master` with clear descriptions and testing steps
-
-- Linters & formatters: consider adding `black`, `flake8`, or `ruff` to the development dependencies.
 
 ## Security & privacy
 - Do not commit API keys or other secrets into the repository.
@@ -96,15 +89,5 @@ Refer to the top of each file (`app.py`, `agent.py`, `audio.py`) for any file-sp
 - If external API calls fail, verify network connectivity and that your API key is valid and not rate-limited.
 - If you see errors about missing packages, re-run `pip install -r requirements.txt` in an activated virtual environment.
 
-## Contributing
-Contributions are welcome. Please:
-1. Open an issue to discuss large changes.
-2. Submit PRs with clear descriptions and tests where applicable.
-3. Follow consistent code formatting and include documentation updates as needed.
 
-## License
-No license specified. If you intend to open-source this project, add a LICENSE file (for example MIT, Apache-2.0) to clarify usage and contributions.
-
-## Acknowledgements
-- Built from the project structure in this repository. Thanks to contributors who add features, fixes, and documentation.
 
