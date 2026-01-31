@@ -1,4 +1,3 @@
-# audio.py - The Voice Input/Output Library
 from faster_whisper import WhisperModel
 import sounddevice as sd
 import numpy as np
@@ -12,9 +11,7 @@ import time
 import re
 import platform
 
-# --- CONFIGURATION ---
-# SET THIS TO TRUE FOR INSTANT SPEED (Demo Mode)
-# SET TO FALSE FOR HIGH QUALITY VOICE (Video Mode)
+# Configuration
 FAST_MODE = False  
 
 SILENCE_THRESHOLD = 15.0  
@@ -87,13 +84,9 @@ async def speak(text):
     print(f"🤖 Bot: {text}")
     
     if FAST_MODE:
-        # --- MAC NATIVE (INSTANT) ---
-        # This uses the built-in macOS voice. Zero latency.
-        # We replace quotes to prevent shell errors
         safe_text = text.replace('"', '').replace("'", "")
         os.system(f'say "{safe_text}"')
     else:
-        # --- CLOUD (HIGH QUALITY, SLOW) ---
         communicate = edge_tts.Communicate(text, "en-US-AriaNeural")
         temp_mp3 = "response.mp3"
         await communicate.save(temp_mp3)
