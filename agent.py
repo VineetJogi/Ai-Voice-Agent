@@ -6,7 +6,7 @@ import tools  # <--- This imports the file you just pasted
 
 # --- CONFIGURATION ---
 # PASTE YOUR API KEY HERE
-GOOGLE_API_KEY = "AIzaSyDMseP_f_ioCMv9qxGAQc_ulBlGZl3A87c"
+GOOGLE_API_KEY = "AIzaSyDnjmB7oG7_Tj0erbnYlNsgCpFTb1oJz4k"
 
 genai.configure(api_key=GOOGLE_API_KEY)
 
