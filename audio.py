@@ -1,72 +1,75 @@
-from faster_whisper import WhisperModel
-import sounddevice as sd
-import numpy as np
-import asyncio
-import edge_tts
-import tempfile
+import speech_recognition as sr
 import os
-import scipy.io.wavfile as wav
+import edge_tts
 import pygame
 import time
-import re
-import platform
+import asyncio
+import tempfile
 
-# Configuration
-FAST_MODE = False  
+# --- CONFIGURATION ---
+# "True" uses your Mac's 'say' command (Instant)
+# "False" uses EdgeTTS (Higher Quality)
+FAST_MODE = True  
 
-SILENCE_THRESHOLD = 15.0  
-SILENCE_DURATION = 1.5
-SAMPLE_RATE = 16000
-MODEL_SIZE = "base.en" 
-
-print(f"Loading Whisper ({MODEL_SIZE})...")
-model = WhisperModel(MODEL_SIZE, device="cpu", compute_type="int8", cpu_threads=4)
-print(f"Audio System Ready. (Fast Mode: {FAST_MODE})")
+print("🎤 Initializing SpeechRecognition (Google Mode)...")
+recognizer = sr.Recognizer()
+print("✅ Audio System Ready.")
 
 def listen():
-    """Records audio until silence. Returns path to .wav file."""
-    print("\n🔴 Listening...")
-    audio_data = []
-    silent_chunks = 0
-    speaking_started = False
-    
-    def callback(indata, frames, time, status):
-        nonlocal silent_chunks, speaking_started
-        volume = np.linalg.norm(indata) * 10
+    """
+    Listens to the microphone using SpeechRecognition's auto-silence detection.
+    Returns: The path to a temporary .wav file.
+    """
+    with sr.Microphone() as source:
+        print("\n🔴 Listening... (Speak now)")
         
-        if volume < SILENCE_THRESHOLD:
-            silent_chunks += 1
-        else:
-            silent_chunks = 0
-            speaking_started = True 
+        # 1. Adjust for background noise (1 second calibration)
+        # You can comment this out if it delays the start too much
+        recognizer.adjust_for_ambient_noise(source, duration=0.5)
         
-        if speaking_started:
-            audio_data.append(indata.copy())
-    
-    stream = sd.InputStream(callback=callback, channels=1, samplerate=SAMPLE_RATE)
-    with stream:
-        while True:
-            sd.sleep(100)
-            if speaking_started and (silent_chunks * 0.1 > SILENCE_DURATION):
-                break
-                
-    print("✅ Processing input...")
-    full_audio = np.concatenate(audio_data, axis=0)
-    temp_wav = tempfile.mktemp(suffix=".wav")
-    wav.write(temp_wav, SAMPLE_RATE, full_audio)
-    return temp_wav
+        try:
+            # 2. Listen (Wait for speech, then record until silence)
+            # timeout=5 means "give up if no one speaks in 5s"
+            # phrase_time_limit=10 means "cut them off after 10s"
+            audio_data = recognizer.listen(source, timeout=5, phrase_time_limit=10)
+            print("✅ Audio captured.")
+            
+            # 3. Save to temp WAV file (to match your old workflow)
+            temp_wav = tempfile.mktemp(suffix=".wav")
+            with open(temp_wav, "wb") as f:
+                f.write(audio_data.get_wav_data())
+            
+            return temp_wav
+            
+        except sr.WaitTimeoutError:
+            print("⚠️ No speech detected (Timeout).")
+            return None
 
 def transcribe(wav_path):
-    """Transcribes .wav to text."""
-    segments, info = model.transcribe(wav_path, beam_size=5)
-    text = " ".join([segment.text for segment in segments]).strip()
-    
-    if not text or text in [".", "...", "Thank you."]:
+    """
+    Sends the audio file to Google Web Speech API for transcription.
+    """
+    if not wav_path or not os.path.exists(wav_path):
         return None
-    return text
+        
+    try:
+        # Load the file back into Recognizer
+        with sr.AudioFile(wav_path) as source:
+            audio_data = recognizer.record(source)
+        
+        # Send to Google (Requires Internet)
+        text = recognizer.recognize_google(audio_data)
+        return text
+        
+    except sr.UnknownValueError:
+        # Google couldn't understand the audio
+        return None
+    except sr.RequestError:
+        print("❌ Could not connect to Google API.")
+        return None
 
 def play_file(file_path):
-    """Plays audio using Pygame."""
+    """Plays audio safely using Pygame."""
     try:
         pygame.mixer.init()
         pygame.mixer.music.load(file_path)
@@ -79,14 +82,16 @@ def play_file(file_path):
         print(f"Playback Error: {e}")
 
 async def speak(text):
-    """Hybrid TTS: Uses Mac 'say' command (Fast) or EdgeTTS (High Quality)"""
+    """Hybrid TTS: Mac Native (Fast) or Edge (Quality)"""
     if not text: return
     print(f"🤖 Bot: {text}")
     
     if FAST_MODE:
+        # Mac Native Voice (Zero Latency)
         safe_text = text.replace('"', '').replace("'", "")
         os.system(f'say "{safe_text}"')
     else:
+        # Cloud Voice (High Quality)
         communicate = edge_tts.Communicate(text, "en-US-AriaNeural")
         temp_mp3 = "response.mp3"
         await communicate.save(temp_mp3)
