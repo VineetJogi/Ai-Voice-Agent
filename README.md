@@ -2,8 +2,6 @@
 
 Ai-Voice-Agent is a Python-based conversational voice agent that integrates speech input, AI-driven processing, and speech output. It combines audio handling and an agent core to allow interactive voice-driven tasks and experiments. This repository contains the main agent code, audio utilities, a simple application entrypoint, and supporting tools.
 
-> Note: This README was prepared from the repository structure. Please review runtime configuration and any required API keys before running.
-
 ## Features
 - Microphone input and audio processing
 - AI-powered conversational agent logic (agent core)
@@ -109,3 +107,4 @@ No license specified. If you intend to open-source this project, add a LICENSE f
 
 ## Acknowledgements
 - Built from the project structure in this repository. Thanks to contributors who add features, fixes, and documentation.
+
