@@ -2,14 +2,16 @@ import os
 import google.generativeai as genai
 from google.generativeai.types import RequestOptions
 from google.api_core import retry
-import tools
+import tools  # <--- This imports the file you just pasted
 
-# Configuration
-GOOGLE_API_KEY = "AIzaSyDnjmB7oG7_Tj0erbnYlNsgCpFTb1oJz4k"
+# --- CONFIGURATION ---
+# PASTE YOUR API KEY HERE
+GOOGLE_API_KEY = "AIzaSyDidXuBe7NCYmXp5cMtyKJjj-Jwsu7BFIQ"
 
 genai.configure(api_key=GOOGLE_API_KEY)
 
-# System Prompt
+# --- SYSTEM PROMPT ---
+# We teach the AI how to use your specific tools here.
 SYSTEM_INSTRUCTION = """
 You are "Nova", an intelligent Customer Support Voice Agent for an e-commerce platform.
 
@@ -30,7 +32,7 @@ class VoiceAgent:
     def __init__(self):
         print("--- Initializing AI Brain (Gemini 2.0 Flash) ---")
         
-        # 1. Tools Registration
+        # 1. Register the tools EXACTLY as defined in tools.py
         self.tools_list = [
             tools.search_products,
             tools.get_order_status,
@@ -38,14 +40,16 @@ class VoiceAgent:
             tools.get_product_faq
         ]
 
-        # 2. Model Setup
+        # 2. Setup the Model
+        # using 'gemini-1.5-flash' for maximum speed
         self.model = genai.GenerativeModel(
             model_name='gemini-flash-latest',
             tools=self.tools_list,
             system_instruction=SYSTEM_INSTRUCTION
         )
 
-        # 3. Chat Session
+        # 3. Start the Chat Session
+        # Automatic function calling handles the DB queries for you
         self.chat_session = self.model.start_chat(
             enable_automatic_function_calling=True
         )
@@ -57,6 +61,7 @@ class VoiceAgent:
         Output: "Order O0001 was delivered on Friday."
         """
         try:
+            # Retry policy helps if the API has a tiny hiccup
             response = self.chat_session.send_message(
                 user_text,
                 request_options=RequestOptions(retry=retry.Retry(initial=1.0, multiplier=2.0, maximum=10.0))
@@ -66,7 +71,7 @@ class VoiceAgent:
             print(f"❌ AI Error: {e}")
             return "I am sorry, I am having trouble accessing the database right now."
 
-# Test Block
+# --- TESTING BLOCK (Run this file directly to test the Brain) ---
 if __name__ == "__main__":
     agent = VoiceAgent()
     print("\n💬 Chat with Nova (Type 'quit' to exit)\n")
